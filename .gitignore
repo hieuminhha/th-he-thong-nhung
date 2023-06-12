@@ -1,0 +1,7 @@
+build
+.gdb_history
+Debug
+Release
+*.launch
+.settings
+.mxproject
