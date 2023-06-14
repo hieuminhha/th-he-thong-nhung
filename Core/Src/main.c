@@ -42,10 +42,14 @@
 /* Private variables ---------------------------------------------------------*/
 SD_HandleTypeDef hsd;
 
+UART_HandleTypeDef huart1;
+
 /* USER CODE BEGIN PV */
 FATFS fatfs;
 FIL myfile;
 FRESULT fresult;
+UINT bw;         /* File read/write count */
+BYTE buffer[] = "hello\r\n";
 
 uint8_t receive_arr[100];
 uint8_t byte_read = 0;
@@ -56,6 +60,7 @@ uint8_t byte_read = 0;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_SDIO_SD_Init(void);
+static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -95,22 +100,24 @@ int main(void)
   MX_GPIO_Init();
   MX_SDIO_SD_Init();
   MX_FATFS_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   if (BSP_SD_Init() == MSD_OK)
   {
     fresult = f_mount(&fatfs, "", 1);
     fresult = f_open(&myfile, "sdiotest.txt", FA_CREATE_ALWAYS|FA_WRITE);
-    f_printf(&myfile, "ha minh hieu\n");
+//    fresult = f_lseek(&myfile, 0);
+//    fresult = f_write(&myfile, buffer, strlen((char *)buffer), &bw);
+//    fresult = f_sync(&myfile);
+    int temp = f_printf(&myfile, "ha minh hieu\r\n");
+    f_close(&myfile);
+
+    fresult = f_open(&myfile, "sdiotest.txt", FA_READ);
+    fresult = f_read(&myfile, &receive_arr, f_size(&myfile), (UINT*)&byte_read);
+    HAL_UART_Transmit(&huart1, receive_arr, strlen((char *)receive_arr), 100);
     f_close(&myfile);
   }
 
-//  if (BSP_SD_Init() == MSD_OK)
-//  {
-//    fresult = f_mount(&fatfs, "", 1);
-//    fresult = f_open(&myfile, "sdiotest.txt", FA_READ);
-//    fresult = f_read(&myfile, &receive_arr, f_size(&myfile), (UINT*)&byte_read);
-//    f_close(&myfile);
-//  }
 
 
 
@@ -151,7 +158,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLM = 4;
   RCC_OscInitStruct.PLL.PLLN = 72;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-  RCC_OscInitStruct.PLL.PLLQ = 3;
+  RCC_OscInitStruct.PLL.PLLQ = 12;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -197,6 +204,39 @@ static void MX_SDIO_SD_Init(void)
   /* USER CODE BEGIN SDIO_Init 2 */
 
   /* USER CODE END SDIO_Init 2 */
+
+}
+
+/**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
 
 }
 
