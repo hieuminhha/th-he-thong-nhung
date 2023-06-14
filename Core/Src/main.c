@@ -43,6 +43,12 @@
 SD_HandleTypeDef hsd;
 
 /* USER CODE BEGIN PV */
+FATFS fatfs;
+FIL myfile;
+FRESULT fresult;
+
+uint8_t receive_arr[100];
+uint8_t byte_read = 0;
 
 /* USER CODE END PV */
 
@@ -90,6 +96,23 @@ int main(void)
   MX_SDIO_SD_Init();
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
+  if (BSP_SD_Init() == MSD_OK)
+  {
+    fresult = f_mount(&fatfs, "", 1);
+    fresult = f_open(&myfile, "sdiotest.txt", FA_CREATE_ALWAYS|FA_WRITE);
+    f_printf(&myfile, "ha minh hieu\n");
+    f_close(&myfile);
+  }
+
+//  if (BSP_SD_Init() == MSD_OK)
+//  {
+//    fresult = f_mount(&fatfs, "", 1);
+//    fresult = f_open(&myfile, "sdiotest.txt", FA_READ);
+//    fresult = f_read(&myfile, &receive_arr, f_size(&myfile), (UINT*)&byte_read);
+//    f_close(&myfile);
+//  }
+
+
 
   /* USER CODE END 2 */
 
