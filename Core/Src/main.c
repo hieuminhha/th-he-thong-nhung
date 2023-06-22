@@ -89,7 +89,7 @@ static void process_sd_card(void)
   {
     if (BSP_SD_Init() != MSD_OK)
     {
-      uart_write("Init SD card fail\r\n");
+      uart_write("\nInit SD card fail\r\n");
       break;
     }
     
@@ -97,11 +97,11 @@ static void process_sd_card(void)
     f_result = f_mount(&FatFs, "", 1); // 1=mount now
     if (f_result != FR_OK)
     {
-      uart_write("No SD Card found : (%i)\r\n", f_result);
+      uart_write("\nNo SD Card found : (%i)\r\n", f_result);
       break;
     }
 
-    uart_write("SD Card Mounted Successfully!\r\n");
+    uart_write("\nSD Card Mounted Successfully!\r\n");
     HAL_Delay(2000);
 
     // Read the SD Card Total size and Free Size
@@ -113,21 +113,21 @@ static void process_sd_card(void)
     totalSpace = (uint32_t)((pfs->n_fatent - 2) * pfs->csize * 0.5);
     freeSpace = (uint32_t)(fre_clust * pfs->csize * 0.5);
 
-    uart_write("TotalSpace : %lu bytes, FreeSpace = %lu bytes\r\n", totalSpace, freeSpace);
+    uart_write("\nTotalSpace : %lu bytes, FreeSpace = %lu bytes\r\n", totalSpace, freeSpace);
     HAL_Delay(2000);
 
-    uart_write("Open file file_htn.txt to write, if it hasn't been created, then create it!\r\n");
+    uart_write("\nOpen file file_htn.txt to write, if it hasn't been created, then create it!\r\n");
     HAL_Delay(2000);
     
     // Open the file
     f_result = f_open(&fil, "file_htn.txt", FA_CREATE_ALWAYS|FA_WRITE);
     if (f_result != FR_OK)
     {
-      uart_write("File creation/open Error : (%i)\r\n", f_result);
+      uart_write("\nFile creation/open Error : (%i)\r\n", f_result);
       break;
     }
 
-    uart_write("Writing data to sd card!\r\n");
+    uart_write("\nWriting data to sd card!\r\n");
     HAL_Delay(2000);
   
     // write the data
@@ -138,36 +138,36 @@ static void process_sd_card(void)
     f_close(&fil);
     
     // Open the file
-    uart_write("Open file file_htn.txt to read!\r\n");
+    uart_write("\nOpen file file_htn.txt to read!\r\n");
     HAL_Delay(2000);
 
     f_result = f_open(&fil, "file_htn.txt", FA_READ);
 
     if (f_result != FR_OK)
     {
-      uart_write("File opening Error : (%i)\r\n", f_result);
+      uart_write("\nFile opening Error : (%i)\r\n", f_result);
       break;
     }
 
     // read the data
     f_gets(buf, sizeof(buf), &fil);
-    uart_write("Read Data form sd card : %s\n", buf);
+    uart_write("\nRead Data form sd card : %s\r\n", buf);
     HAL_Delay(2000);
     // close your file
     f_close(&fil);
-    uart_write("Closing File!\r\n");
+    uart_write("\nClosing File!\r\n");
 #if 0
     //Delete the file.
     f_result = f_unlink(file_he_thong_nhung.txt);
     if (f_result != FR_OK)
     {
-      uart_write("Cannot able to delete the file\n");
+      uart_write("\nCannot able to delete the file\n");
     }
 #endif
   } while (false);
   // We're done, so de-mount the drive
   f_mount(NULL, "", 0);
-  uart_write("SD Card Unmounted Successfully!\r\n");
+  uart_write("\nSD Card Unmounted Successfully!\r\n");
 }
 
 /* USER CODE END 0 */
@@ -374,7 +374,7 @@ void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
-     ex: uart_write("Wrong parameters value: file %s on line %d\r\n", file, line) */
+     ex: uart_write("\nWrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
