@@ -87,6 +87,12 @@ static void process_sd_card(void)
   char buf[300];
   do
   {
+    if (BSP_SD_Init() != MSD_OK)
+    {
+      uart_write("Init SD card fail\r\n");
+      break;
+    }
+    
     // Mount the SD Card
     f_result = f_mount(&FatFs, "", 1); // 1=mount now
     if (f_result != FR_OK)
@@ -96,7 +102,6 @@ static void process_sd_card(void)
     }
 
     uart_write("SD Card Mounted Successfully!\r\n");
-    
     HAL_Delay(2000);
 
     // Read the SD Card Total size and Free Size
@@ -108,11 +113,14 @@ static void process_sd_card(void)
     totalSpace = (uint32_t)((pfs->n_fatent - 2) * pfs->csize * 0.5);
     freeSpace = (uint32_t)(fre_clust * pfs->csize * 0.5);
 
-    uart_write("TotalSpace : %lu bytes, FreeSpace = %lu bytes\n", totalSpace, freeSpace);
+    uart_write("TotalSpace : %lu bytes, FreeSpace = %lu bytes\r\n", totalSpace, freeSpace);
     HAL_Delay(2000);
 
+    uart_write("Open file file_htn.txt to write, if it hasn't been created, then create it!\r\n");
+    HAL_Delay(2000);
+    
     // Open the file
-    f_result = f_open(&fil, "file_he_thong_nhung.txt", FA_WRITE | FA_READ | FA_CREATE_ALWAYS);
+    f_result = f_open(&fil, "file_htn.txt", FA_CREATE_ALWAYS|FA_WRITE);
     if (f_result != FR_OK)
     {
       uart_write("File creation/open Error : (%i)\r\n", f_result);
@@ -120,21 +128,31 @@ static void process_sd_card(void)
     }
 
     uart_write("Writing data to sd card!\r\n");
+    HAL_Delay(2000);
+  
     // write the data
     f_puts("Xin chao, chung minh la sinh vien truong KHTN, khoa Dien tu - Vien thong\n", &fil);
+    HAL_Delay(2000);
+
     // close your file
     f_close(&fil);
+    
     // Open the file
-    f_result = f_open(&fil, "file_he_thong_nhung.txt", FA_READ);
+    uart_write("Open file file_htn.txt to read!\r\n");
+    HAL_Delay(2000);
+
+    f_result = f_open(&fil, "file_htn.txt", FA_READ);
+
     if (f_result != FR_OK)
     {
       uart_write("File opening Error : (%i)\r\n", f_result);
       break;
     }
-    HAL_Delay(2000);
+
     // read the data
     f_gets(buf, sizeof(buf), &fil);
     uart_write("Read Data form sd card : %s\n", buf);
+    HAL_Delay(2000);
     // close your file
     f_close(&fil);
     uart_write("Closing File!\r\n");
